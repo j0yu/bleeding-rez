@@ -46,9 +46,4 @@ deploy_script:
   # Deploy on tag
   - cmd: pip install wheel twine
   - cmd: python setup.py sdist bdist_wheel
-  - cmd: >
-      if "%APPVEYOR_REPO_TAG%" == "true" (
-        python -m twine upload dist/*
-      ) else (
-        echo Not on a tag, won't deploy to pypi
-      )
+  - cmd: if "%APPVEYOR_REPO_TAG%" == "true" ( python -m twine upload dist/* ) else ( echo Not on a tag, won't deploy to pypi )
