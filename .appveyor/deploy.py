@@ -14,7 +14,7 @@ password={PYPI_PASSWORD}
 def main():
     print("Deploying to PyPI..")
 
-    with open(os.path.expanduser("~/.pypirc")) as f:
+    with open(os.path.expanduser("~/.pypirc"), "w") as f:
         f.write(pypirc)
 
     subprocess.check_call([
