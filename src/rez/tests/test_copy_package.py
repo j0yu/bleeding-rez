@@ -157,7 +157,12 @@ class TestCopyPackage(TestBase, TempdirMixin):
         self._assert_copied(result, 1, 0)
 
         # check that package payload was overwritten
-        self.assertNotEqual(os.stat(pyfile).st_ctime, ctime)
+        self.assertNotEqual(
+
+            # Truncate to avoid rounding error
+            int(os.stat(pyfile).st_ctime),
+            int(ctime)
+        )
 
     def test_3(self):
         """Package copy, variants, overwrite and non-overwrite."""
