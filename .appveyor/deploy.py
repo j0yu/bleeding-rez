@@ -17,9 +17,9 @@ def main():
     with open(os.path.expanduser("~/.pypirc"), "w") as f:
         f.write(pypirc)
 
-    subprocess.check_call([
-        "python", "-m", "twine", "upload", "dist/*"
-    ])
+    subprocess.check_call(["pip", "install" "wheel" "twine"])
+    subprocess.check_call(["python", "setup.py", "sdist", "bdist_wheel"])
+    subprocess.check_call(["python", "-m", "twine", "upload", "dist/*"])
 
 
 if os.getenv("APPVEYOR_REPO_TAG") == "true":

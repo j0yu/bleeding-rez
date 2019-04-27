@@ -34,5 +34,4 @@ test_script:
 # Automatically upload to PyPI whenever a new tag is made
 #
 deploy_script:
-  - cmd: pip install wheel twine
   - cmd: python .appveyor/deploy.py
