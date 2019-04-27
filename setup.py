@@ -65,7 +65,7 @@ scripts = [
 
 
 setup(
-    name="rez",
+    name="bleeding-rez",
     version=version,
     description=("A cross-platform packaging system that can build and "
                  "install multiple version of packages, and dynamically "
