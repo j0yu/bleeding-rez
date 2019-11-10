@@ -11,7 +11,6 @@ from rez.utils.logging_ import print_debug
 from rez.vendor.six import six
 from pipes import quote
 import subprocess
-import os.path
 import os
 import platform
 import sys
@@ -125,14 +124,10 @@ def _run_command(args):
     cmd_str = ' '.join(quote(x) for x in args)
     log("running: %s" % cmd_str)
 
-    # https://github.com/nerdvegas/rez/pull/659
-    use_shell = ("Windows" in platform.system())
-
     p = Popen(
         args,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=use_shell,
         text=True
     )
 
