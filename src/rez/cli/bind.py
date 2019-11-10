@@ -1,9 +1,6 @@
-'''
-Create a Rez package for existing software.
-'''
+"""Create a Rez package for existing software."""
 from __future__ import print_function
-
-import argparse
+from rez.vendor import argparse
 
 
 def setup_parser(parser, completions=False):
@@ -63,9 +60,8 @@ def command(opts, parser, extra_arg_groups=None):
                  "os",
                  "python",
                  "rez",
-                 "rezgui",
-                 "setuptools",
-                 "pip"]
+                 "bleeding_rez",
+                 "rezgui"]
 
         variants = []
 

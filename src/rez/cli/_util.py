@@ -1,9 +1,8 @@
 from __future__ import print_function
-
 import os
 import sys
 import signal
-from argparse import _SubParsersAction, ArgumentParser, SUPPRESS, \
+from rez.vendor.argparse import _SubParsersAction, ArgumentParser, SUPPRESS, \
     ArgumentError
 
 

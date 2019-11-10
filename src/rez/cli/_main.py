@@ -1,15 +1,12 @@
-"""
-The main command-line entry point.
-"""
+"""The main command-line entry point."""
 from __future__ import print_function
-
 import sys
 import importlib
 from argparse import _StoreTrueAction, SUPPRESS
 from rez.cli._util import subcommands, LazyArgumentParser, _env_var_true
-from rez.utils.logging_ import print_error
-from rez.exceptions import RezError, RezSystemError
-from rez import __version__
+from rez.utils.logging_ import print_error, setup_logging
+from rez.exceptions import RezError, RezSystemError, RezUncatchableError
+from rez import __version__, __project__
 
 
 class SetupRezSubParser(object):
@@ -71,7 +68,10 @@ class InfoAction(_StoreTrueAction):
 
 
 def run(command=None):
+    setup_logging()
 
+    # Prevent `__pycache__` folders from being accidentally
+    # created and picked up as Rez packages.
     sys.dont_write_bytecode = True
 
     parser = LazyArgumentParser("rez")
@@ -79,7 +79,7 @@ def run(command=None):
     parser.add_argument("-i", "--info", action=InfoAction,
                         help="print information about rez and exit")
     parser.add_argument("-V", "--version", action="version",
-                        version="Rez %s" % __version__)
+                        version="%s %s" % (__project__, __version__))
 
     # add args common to all subcommands... we add them both to the top parser,
     # AND to the subparsers, for two reasons:
@@ -136,7 +136,7 @@ def run(command=None):
         extra_arg_groups = []
 
     if opts.debug or _env_var_true("REZ_DEBUG"):
-        exc_type = None
+        exc_type = RezUncatchableError
     else:
         exc_type = RezError
 
@@ -157,6 +157,83 @@ def run(command=None):
             sys.exit(1)
 
     sys.exit(returncode or 0)
+
+
+# Entry points for pip
+def rez_config():
+    return run("config")
+
+
+def rez_build():
+    return run("build")
+
+
+def rez_release():
+    return run("release")
+
+
+def rez_env():
+    return run("env")
+
+
+def rez_context():
+    return run("context")
+
+
+def rez_suite():
+    return run("suite")
+
+
+def rez_interpret():
+    return run("interpret")
+
+
+def rez_python():
+    return run("python")
+
+
+def rez_selftest():
+    return run("selftest")
+
+
+def rez_bind():
+    return run("bind")
+
+
+def rez_search():
+    return run("search")
+
+
+def rez_view():
+    return run("view")
+
+
+def rez_status():
+    return run("status")
+
+
+def rez_help():
+    return run("help")
+
+
+def rez_depends():
+    return run("depends")
+
+
+def rez_memcache():
+    return run("memcache")
+
+
+def rez_yaml2py():
+    return run("yaml2py")
+
+
+def run_fwd():
+    return run("forward")
+
+
+def run_complete():
+    return run("complete")
 
 
 if __name__ == '__main__':

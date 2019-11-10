@@ -1,11 +1,8 @@
-'''
-Run unit tests.
-'''
-
+"""Run unit tests."""
 import inspect
 import os
-import argparse
 from pkgutil import iter_modules
+import rez.vendor.argparse as argparse
 
 cli_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 src_rez_dir = os.path.dirname(cli_dir)
