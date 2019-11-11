@@ -5,8 +5,8 @@ from rez.vendor.six import six
 from rez.vendor.schema.schema import Schema, Optional, Use, And
 
 
+# Backwards compatibility with Python 2
 basestring = six.string_types[0]
-
 
 # an alias which just so happens to be the same number of characters as
 # 'Optional' so that our schema are easier to read

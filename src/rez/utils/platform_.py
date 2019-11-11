@@ -86,8 +86,9 @@ class Platform(object):
             return self._physical_cores_base()
         except Exception as e:
             from rez.utils.logging_ import print_error
-            print_error("Error detecting physical core count, defaulting to 1: %s"
-                        % str(e))
+            print_error(
+                "Error detecting physical core count, defaulting to 1: %s" % e
+            )
         return 1
 
     @cached_property
@@ -101,8 +102,9 @@ class Platform(object):
             return self._logical_cores()
         except Exception as e:
             from rez.utils.logging_ import print_error
-            print_error("Error detecting logical core count, defaulting to 1: %s"
-                        % str(e))
+            print_error(
+                "Error detecting logical core count, defaulting to 1: %s" % e
+            )
         return 1
 
     @property
@@ -161,8 +163,12 @@ class Platform(object):
         raise NotImplementedError
 
     def _logical_cores(self):
-        from multiprocessing import cpu_count
-        return cpu_count()
+        """Bleeding-rez favours Python 3, falling back to multiprocessing."""
+        try:
+            return os.cpu_count()
+        except AttributeError:
+            import multiprocessing
+            return multiprocessing.cpu_count()
 
 
 # -----------------------------------------------------------------------------
@@ -307,7 +313,7 @@ class LinuxPlatform(_UnixPlatform):
         ed = os.getenv("EDITOR")
         if ed is None:
             from rez.util import which
-            ed = which("vi", "vim", "xdg-open")
+            ed = which("xdg-open", "vim", "vi")
         return ed
 
     def _difftool(self):
@@ -461,7 +467,10 @@ class OSXPlatform(_UnixPlatform):
 
     def _difftool(self):
         from rez.util import which
-        return which("meld", "diff")
+        return which("kdiff3", "meld", "diff")
+
+    def _new_session_popen_args(self):
+        return dict(preexec_fn=os.setpgrp)
 
 
 # -----------------------------------------------------------------------------
@@ -565,9 +574,29 @@ class WindowsPlatform(Platform):
         return self._physical_cores_from_wmic()
 
     def _difftool(self):
-        # although meld would be preferred, fc ships with all Windows versions back to DOS
+        """Get diff tool for Windows.
+
+        ``WinDiff`` and ``meld`` are preferred. ``fc`` ships with all Windows
+        versions back to DOS.
+
+        To Do:
+            Someone on Windows test if this simpler return statement works::
+
+                return which(
+                    r"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\x64\WinDiff.Exe",
+                    "meld",
+                    "fc",
+                )
+
+        """
         from rez.util import which
-        return which("meld", "fc")
+        windiff_exe = (
+            r"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\x64\WinDiff.Exe"
+        )
+        if os.path.exists(windiff_exe):
+            return windiff_exe
+        else:
+            return which("meld", "fc")
 
 
 # singleton

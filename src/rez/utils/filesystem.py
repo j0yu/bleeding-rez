@@ -2,11 +2,11 @@
 Filesystem-related utilities.
 """
 from __future__ import print_function
-
 from threading import Lock
 from tempfile import mkdtemp
 from contextlib import contextmanager
 from uuid import uuid4
+from rez.vendor.six import six
 import weakref
 import atexit
 import posixpath
@@ -16,10 +16,10 @@ import shutil
 import os
 import re
 import stat
-import platform
 
-from rez.vendor.six import six
-from rez.utils.platform_ import platform_
+
+# Backwards compatibility with Python 2
+basestring = six.string_types[0]
 
 
 class TempDirs(object):
@@ -211,8 +211,16 @@ def replacing_copy(src, dest, follow_symlinks=False):
     Note that this behavior is different to `shutil.copy`, which copies src
     into dest if dest is an existing dir.
     """
+
+    # Supported on Linux since Python 2.6, but Windows since 3.2
+    copy_symlink = (
+        not follow_symlinks
+        and hasattr(os, "readlink")
+        and os.path.islink(src)
+    )
+
     with make_tmp_name(dest) as tmp_dest:
-        if os.path.islink(src) and not follow_symlinks:
+        if copy_symlink:
             # special case - copy just a symlink
             src_ = os.readlink(src)
             os.symlink(src_, tmp_dest)
@@ -290,7 +298,13 @@ def is_subdirectory(path_a, path_b):
     """Returns True if `path_a` is a subdirectory of `path_b`."""
     path_a = os.path.realpath(path_a)
     path_b = os.path.realpath(path_b)
-    relative = os.path.relpath(path_a, path_b)
+    try:
+        relative = os.path.relpath(path_a, path_b)
+    except ValueError:
+        # On Windows a ValueError is raised if the paths are on different
+        # drives, UNC roots, or are mixing drive and UNC root specifications.
+        # This of course means path_a can't be a subdirectory of path_b.
+        return False
     return (not relative.startswith(os.pardir + os.sep))
 
 

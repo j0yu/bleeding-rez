@@ -1,3 +1,49 @@
+# bleeding-rez Change Log
+
+## Unreleased (YYYY-MM-DD)
+
+### Added
+
+- Ignores `IndexError` in `rez.utils.memcached.Client._get_stats()`.
+- `rez bind bleeding_rez`.
+- `rez build --release`.
+- `--isolated`, `--inherited`, `--env` and `--self` flags to `rez env`.
+- `WinDiff.Exe` as first priority for Windows diff tool.
+- `python -m rez` via `rez.__main__` module.
+- Azure Pipelines.
+- `__project__` attribute to `rez` package.
+- Ressurrected `rez.vendor.argparse`.
+- `rez.utils.logging_.setup_logging()`
+- `rez.utils.memcached.Client._Miss` objects now iterable.
+
+### Fixed
+
+- Missing logging formatting in `rez.cli._main.run`
+- Symlink detection for `rez.utils.filesystem.replacing_copy()`
+- Return `False` for `ValueError` in  `rez.utils.filesystem.is_subdirectory()`
+
+### Changed
+
+- Replaced `rez pip` CLI in-place with `bleeding-rez`'s own version.
+- `rez bind python` to use script based binding rather than symlink based.
+- More self-contained, `bleeding-rez` specific `setup.py`.
+- Not using `shell` kwarg for `Popen` in `rez.bind._utils._run_command()`
+- Linux editors now picked in this order: `$EDITOR`, `xdg-open`, `vim`, `vi`.
+- OSX diff tool now picked in this order: `kdiff3`, `meld`, `diff`.
+- Resurrected and improved the older `rez.utils.reraise()` with `format_str`
+  kwargs.
+- Simplified `rez.utils.graph_utils.save_graph()`.
+- `rez.utils.platform_.Platform._logical_cores()` tries Python 3
+  `os.cpu_count()` first before falling back to `multiprocessing.cpu_count()`.
+
+### Removed
+
+- The entire `build_utils` package.
+- `rez.cli._entry_points` module un-used after changed `setup.py`.
+- `rez bind pip` and `rez bind setuptools`.
+- `rez.utils.graph_utils.save_graph_object()` in favour of
+  simplified `rez.utils.graph_utils.save_graph()`.
+
 # Change Log
 
 ## 2.47.13 (2019-11-08)

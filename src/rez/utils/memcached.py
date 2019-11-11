@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from rez.config import config
 from rez.vendor.memcache.memcache import Client as Client_, SERVER_MAX_KEY_LENGTH
 from rez.utils import py23
@@ -25,10 +23,18 @@ class Client(object):
     - unlimited key length;
     - hard/soft flushing;
     - ability to cache None.
+
     """
+
     class _Miss(object):
         def __nonzero__(self):
             return False
+
+        def __iter__(self):
+            yield {}  # solver_dict
+            yield {}  # variant_states_dict
+            yield {}  # release_times_dict
+
         __bool__ = __nonzero__  # py3 compat
 
     miss = _Miss()
@@ -169,7 +175,13 @@ class Client(object):
         return "%s:%s:%s" % (cache_interface_version, self.current, key)
 
     def _get_stats(self, stat_args=None):
-        return self.client.get_stats(stat_args=stat_args)
+        """Bleeding-rez catches IndexError."""
+        try:
+            return self.client.get_stats(stat_args=stat_args)
+        except IndexError:
+            # Client didn't contain any stats at all
+            # Can happen after a .flush()
+            pass
 
     @classmethod
     def _key_hash(cls, key):
