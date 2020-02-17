@@ -1,0 +1,62 @@
+name: Pip
+on:
+  # Don't run on the following updates:
+  # - docker images
+  # - documentation
+  pull_request:
+    paths-ignore:
+      - '.github/docker/**'
+      - '.github/workflows/windows-docker-image.yaml'
+      - 'wiki/**'
+      - '**.md'
+  push:
+    paths-ignore:
+      - '.github/docker/**'
+      - '.github/workflows/windows-docker-image.yaml'
+      - 'wiki/**'
+      - '**.md'
+
+jobs:
+  main:
+    name: Test installing Packages
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Rez and pip
+      run: |
+        pip install -U pip
+        python ./install.py
+
+    - name: Prepare for rez-pip
+      run: |
+        rm -rf "$HOME/packages"
+        mkdir "$HOME/packages"
+        PATH="/opt/rez/bin/rez:$PATH" rez bind python
+        # rm -rf "$HOME/packages/python"
+
+    - name: rez-pip some packages
+      run: |
+        FAILED=$(mktemp)
+        INSTALL_OUTPUT=$(mktemp)
+        export PATH="/opt/rez/bin/rez:$PATH"
+
+        for PKG in ptvsd
+        do
+            rez-pip -i "$PKG" &> "$INSTALL_OUTPUT" && \
+            rez env "$PKG" -- python -c "import "$PKG"; print("$PKG".__file__)" || {
+                rez env "$PKG" -c 'find $REZ_'${PKG^^}'_ROOT' | \
+                cat "$INSTALL_OUTPUT" - >> "$FAILED"; }
+        done
+        if [ $(wc -l < "$FAILED") -gt 0 ]
+        then
+            cat "$FAILED"
+            exit 1
+        fi
