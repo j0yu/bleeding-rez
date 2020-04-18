@@ -21,7 +21,7 @@ FAILED=$(mktemp)
 INSTALL_OUTPUT=$(mktemp)
 
 
-# Test
+# Test, repeat as necessary
 rm -rf $HOME/packages \
 && mkdir $HOME/packages \
 && rez bind python &> /dev/null

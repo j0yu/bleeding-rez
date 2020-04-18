@@ -48,7 +48,7 @@ jobs:
         INSTALL_OUTPUT=$(mktemp)
         export PATH="/opt/rez/bin/rez:$PATH"
 
-        for PKG in ptvsd
+        for PKG in requests six future pylint autopep8 ptvsd
         do
             rez-pip -i "$PKG" &> "$INSTALL_OUTPUT" && \
             rez env "$PKG" -- python -c "import "$PKG"; print("$PKG".__file__)" || {
