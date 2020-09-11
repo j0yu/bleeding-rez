@@ -724,7 +724,7 @@ class UpdateWikiParser(argparse.ArgumentParser):
             dest="release",
             default=GITHUB_RELEASE,
             help=(
-                "GitHub release the wiki is generated from. "
+                'GitHub release the wiki is generated from, e.g. "2.68.0". '
                 "Overrides environment variable GITHUB_REF."
             )
         )

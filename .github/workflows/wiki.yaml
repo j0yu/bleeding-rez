@@ -35,13 +35,18 @@ jobs:
             BRANCH="${{ github.ref }}"
           fi
 
-          python update-wiki.py \
-            --keep-temp \
-            --no-push \
-            --github-release="$BRANCH" \
-            --github-branch="${BRANCH##refs*/}" \
-            --wiki-dir="${{ github.workspace }}"/"${{ env.TEMP_WIKI_DIR }}" \
-            --wiki-url="${{ env.CLONE_URL }}"
+          NAME="${BRANCH##refs*/}"
+
+          UPDATE_ARGS=(--keep-temp --no-push)
+          UPDATE_ARGS+=(--github-branch="$NAME")
+          UPDATE_ARGS+=(--wiki-dir="${{ github.workspace }}"/"${{ env.TEMP_WIKI_DIR }}")
+          UPDATE_ARGS+=(--wiki-url="${{ env.CLONE_URL }}")
+          if (echo "$BRANCH" | grep -q tags) 
+          then
+            UPDATE_ARGS+=(--github-release="$NAME")
+          fi
+
+          python update-wiki.py "${UPDATE_ARGS[@]}"
 
       - uses: actions/upload-artifact@v1.0.0
         with:
